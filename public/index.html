@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de donaciones</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="contenedor login-caja">
+    <div class="tarjeta">
+      <h1>Gestor de donaciones</h1>
+
+      <div class="tabs">
+        <button id="tab-login" class="activa" type="button">Iniciar sesión</button>
+        <button id="tab-registro" type="button">Crear cuenta</button>
+      </div>
+
+      <form id="form-login">
+        <label for="login-correo">Correo</label>
+        <input id="login-correo" name="correo" type="email" required>
+
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" name="password" type="password" required>
+
+        <button type="submit" class="btn-ancho">Entrar</button>
+      </form>
+
+      <form id="form-registro" class="oculto">
+        <label for="reg-nombre">Nombre completo</label>
+        <input id="reg-nombre" name="nombre" required>
+
+        <label><input type="checkbox" id="afiliado" name="afiliado"> Estoy afiliado a una empresa</label>
+        <div id="campo-empresa" class="oculto">
+          <label for="reg-empresa">Nombre de la empresa</label>
+          <input id="reg-empresa" name="empresa">
+        </div>
+
+        <label for="reg-direccion">Dirección</label>
+        <input id="reg-direccion" name="direccion" required>
+
+        <label for="reg-ciudad">Ciudad</label>
+        <input id="reg-ciudad" name="ciudad" required>
+
+        <label for="reg-telefono">Teléfono</label>
+        <input id="reg-telefono" name="telefono" type="tel" required>
+
+        <label for="reg-correo">Correo</label>
+        <input id="reg-correo" name="correo" type="email" required>
+
+        <label for="reg-password">Contraseña (mínimo 8 caracteres)</label>
+        <input id="reg-password" name="password" type="password" minlength="8" required>
+
+        <button type="submit" class="btn-ancho">Crear cuenta</button>
+      </form>
+
+      <div id="mensaje" class="mensaje oculto"></div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/login.js"></script>
+</body>
+</html>

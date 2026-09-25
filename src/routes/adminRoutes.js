@@ -9,6 +9,7 @@ router.use(verificarToken, permitirRoles('admin'));
 router.get('/donations', adminDonations.listarTodas);
 router.patch('/donations/:id/decidir', adminDonations.decidir);
 router.patch('/donations/:id/estado', adminDonations.cambiarEstado);
+router.patch('/donations/:id/beneficiario', adminDonations.asignarBeneficiario);
 
 router.get('/beneficiaries', beneficiaries.listar);
 router.post('/beneficiaries', beneficiaries.crear);

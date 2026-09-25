@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel del donador</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Panel del donador</h1>
+    <div>
+      <button id="btn-notif" class="btn-secundario">🔔 Notificaciones <span id="contador-notif"></span></button>
+      <button id="btn-salir" class="btn-secundario">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="contenedor">
+    <div class="tarjeta">
+      <p id="saludo"></p>
+
+      <div id="panel-notif" class="oculto seccion">
+        <h3>Notificaciones</h3>
+        <div id="lista-notif"></div>
+      </div>
+    </div>
+
+    <div class="tarjeta seccion">
+      <h2>Nueva donación</h2>
+      <form id="form-donacion">
+        <div class="grid-2">
+          <div>
+            <label for="producto">Producto</label>
+            <input id="producto" name="producto" required>
+
+            <label for="categoria">Categoría</label>
+            <select id="categoria" name="categoria" required>
+              <option value="">Selecciona...</option>
+              <option value="alimentos">Alimentos</option>
+              <option value="ropa">Ropa</option>
+              <option value="medicamentos">Medicamentos</option>
+              <option value="higiene">Higiene</option>
+              <option value="muebles">Muebles</option>
+              <option value="otros">Otros</option>
+            </select>
+
+            <label for="cantidad">Cantidad</label>
+            <input id="cantidad" name="cantidad" type="number" min="1" required>
+
+            <label for="peso">Peso (kg)</label>
+            <input id="peso" name="peso" type="number" min="0" step="0.1" required>
+          </div>
+
+          <div>
+            <label><input type="checkbox" id="perecedero" name="perecedero"> Es perecedero</label>
+            <div id="campo-caducidad" class="oculto">
+              <label for="fechaCaducidad">Fecha de caducidad</label>
+              <input id="fechaCaducidad" name="fechaCaducidad" type="date">
+            </div>
+
+            <label for="beneficiarioId">Organización destino</label>
+            <select id="beneficiarioId" name="beneficiarioId">
+              <option value="">Que el programa decida</option>
+            </select>
+
+            <label for="imagen">Imagen del producto</label>
+            <input id="imagen" name="imagen" type="file" accept="image/png,image/jpeg,image/webp" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-ancho">Registrar donación</button>
+      </form>
+      <div id="mensaje-donacion" class="mensaje oculto"></div>
+    </div>
+
+    <div class="tarjeta seccion">
+      <h2>Mis donaciones</h2>
+      <table>
+        <thead>
+          <tr><th>Producto</th><th>Categoría</th><th>Destino</th><th>Estado</th><th>Urgencia</th><th>Fecha</th></tr>
+        </thead>
+        <tbody id="tabla-donaciones"></tbody>
+      </table>
+      <p id="sin-donaciones" class="vacio oculto">Aún no tienes donaciones registradas.</p>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/donador.js"></script>
+</body>
+</html>

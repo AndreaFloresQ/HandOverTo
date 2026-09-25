@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const { verificarToken, permitirRoles } = require('./middleware/auth');
 const donationRoutes = require('./routes/donationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const publicRoutes = require('./routes/publicRoutes');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/public', publicRoutes);
 
 // Rutas temporales para probar roles
 app.get('/api/admin/ping', verificarToken, permitirRoles('admin'), (req, res) =>

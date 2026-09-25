@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel del administrador</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Panel del administrador</h1>
+    <button id="btn-salir" class="btn-secundario">Cerrar sesión</button>
+  </header>
+
+  <main class="contenedor">
+    <p id="saludo"></p>
+
+    <div class="tabs-admin">
+      <button id="tab-donaciones" class="activa" type="button">Donaciones</button>
+      <button id="tab-beneficiarios" type="button">Beneficiarios</button>
+      <button id="tab-recolectores" type="button">Recolectores</button>
+    </div>
+
+    <!-- DONACIONES -->
+    <section id="vista-donaciones" class="tarjeta">
+      <div class="grid-2" style="align-items:end;">
+        <div>
+          <label for="filtro-estado">Filtrar por estado</label>
+          <select id="filtro-estado">
+            <option value="">Todos</option>
+            <option value="pendiente">En espera de aprobación</option>
+            <option value="rechazada">Rechazada</option>
+            <option value="en_camino">En camino a ser recolectada</option>
+            <option value="en_transito">En tránsito</option>
+            <option value="entregada">Entregada</option>
+          </select>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Producto</th><th>De</th><th>Para</th><th>Peso</th><th>Estado</th><th>Urgencia</th><th>Acciones</th></tr>
+        </thead>
+        <tbody id="tabla-donaciones"></tbody>
+      </table>
+      <p id="sin-donaciones" class="vacio oculto">No hay donaciones con ese filtro.</p>
+    </section>
+
+    <!-- BENEFICIARIOS -->
+    <section id="vista-beneficiarios" class="tarjeta oculto">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0;">Beneficiarios</h2>
+        <button id="btn-nuevo-beneficiario">+ Nuevo beneficiario</button>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Nombre</th><th>RFC</th><th>Encargado</th><th>Categorías</th><th>Acciones</th></tr>
+        </thead>
+        <tbody id="tabla-beneficiarios"></tbody>
+      </table>
+    </section>
+
+    <!-- RECOLECTORES -->
+    <section id="vista-recolectores" class="tarjeta oculto">
+      <h2>Recolectores</h2>
+      <table>
+        <thead>
+          <tr><th>Nombre</th><th>Teléfono</th><th>Vehículo</th><th>Capacidad (kg)</th></tr>
+        </thead>
+        <tbody id="tabla-recolectores"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="zona-modal"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

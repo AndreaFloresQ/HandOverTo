@@ -1,0 +1,67 @@
+* { box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; margin: 0; background: #f4f6f8; color: #222; }
+
+.contenedor { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+.login-caja { max-width: 440px; margin: 48px auto; }
+.tarjeta { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }
+
+.topbar { display: flex; justify-content: space-between; align-items: center; background: #1f6f5c; color: #fff; padding: 12px 24px; }
+.topbar h1 { font-size: 1.1rem; margin: 0; }
+
+label { display: block; margin: 12px 0 4px; font-size: 0.9rem; font-weight: 600; }
+input, select, textarea { width: 100%; padding: 8px 10px; border: 1px solid #c5ccd3; border-radius: 6px; font: inherit; }
+input[type="checkbox"] { width: auto; margin-right: 6px; }
+
+button { padding: 9px 16px; border: 0; border-radius: 6px; background: #1f6f5c; color: #fff; font: inherit; cursor: pointer; }
+button:hover { background: #175a4a; }
+.btn-secundario { background: transparent; border: 1px solid currentColor; }
+.btn-secundario:hover { background: rgba(255, 255, 255, 0.15); }
+.btn-ancho { width: 100%; margin-top: 16px; }
+
+.tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.tabs button { flex: 1; background: #e3e8ec; color: #333; }
+.tabs button.activa { background: #1f6f5c; color: #fff; }
+
+.oculto { display: none; }
+.mensaje { margin-top: 12px; padding: 10px; border-radius: 6px; font-size: 0.9rem; }
+.mensaje.error { background: #fdeaea; color: #a12626; }
+.mensaje.ok { background: #e6f5ee; color: #1c6b45; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e3e8ec; font-size: 0.9rem; }
+th { color: #555; font-weight: 600; }
+
+.etiqueta { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; }
+.estado-pendiente { background: #fff3d6; color: #8a6100; }
+.estado-rechazada { background: #fdeaea; color: #a12626; }
+.estado-en_camino { background: #e3f0fd; color: #1a5c96; }
+.estado-en_transito { background: #e8e3fd; color: #4b2f96; }
+.estado-entregada { background: #e6f5ee; color: #1c6b45; }
+
+.urgencia-alta { color: #a12626; font-weight: 600; }
+.urgencia-media { color: #8a6100; font-weight: 600; }
+.urgencia-baja { color: #555; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.seccion { margin-top: 24px; }
+.notif { padding: 10px; border-bottom: 1px solid #e3e8ec; font-size: 0.9rem; }
+.notif.no-leida { background: #f0f7f4; font-weight: 600; }
+.notif small { display: block; font-weight: normal; color: #777; margin-top: 2px; }
+.vacio { color: #888; font-size: 0.9rem; padding: 8px 0; }
+
+@media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.tabs-admin { display: flex; gap: 8px; margin-bottom: 16px; }
+.tabs-admin button { background: #e3e8ec; color: #333; }
+.tabs-admin button.activa { background: #1f6f5c; color: #fff; }
+
+.acciones { display: flex; gap: 6px; flex-wrap: wrap; }
+.acciones button { padding: 5px 10px; font-size: 0.82rem; }
+.btn-peligro { background: #a12626; }
+.btn-peligro:hover { background: #841d1d; }
+
+.modal-fondo { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal { background: #fff; border-radius: 10px; padding: 24px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal h3 { margin-top: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.chips label { display: flex; align-items: center; gap: 4px; font-weight: normal; font-size: 0.85rem; margin: 0; }

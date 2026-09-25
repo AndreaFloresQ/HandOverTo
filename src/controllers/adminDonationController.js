@@ -1,6 +1,7 @@
 const { Donation, User, Beneficiary, Collector, Notification } = require('../models');
 const { ESTADOS } = require('../config/constantes');
 
+
 async function listarTodas(req, res) {
   try {
     const { estado } = req.query;
@@ -62,14 +63,16 @@ async function decidir(req, res) {
         });
       }
 
-      if (beneficiarioId) {
-        const beneficiario = await Beneficiary.findByPk(beneficiarioId);
-        if (!beneficiario) return res.status(400).json({ error: 'Beneficiario no encontrado' });
-        donacion.beneficiarioId = beneficiarioId;
+      // El beneficiario es obligatorio: si el donador no eligió uno, el admin debe hacerlo ahora
+      const idFinal = beneficiarioId || donacion.beneficiarioId;
+      if (!idFinal) {
+        return res.status(400).json({ error: 'Debes asignar un beneficiario antes de aprobar' });
       }
-      // Si no manda beneficiarioId y la donación ya traía uno (elegido por el donador), se respeta.
-      // Si nunca tuvo uno, queda sin asignar y se puede definir después manualmente.
 
+      const beneficiario = await Beneficiary.findByPk(idFinal);
+      if (!beneficiario) return res.status(400).json({ error: 'Beneficiario no encontrado' });
+
+      donacion.beneficiarioId = idFinal;
       donacion.recolectorId = recolectorId;
       donacion.estado = 'en_camino';
       await donacion.save();
@@ -103,6 +106,11 @@ async function cambiarEstado(req, res) {
       return res.status(400).json({ error: 'Esta donación ya no se puede modificar' });
     }
 
+    // Segunda capa de seguridad: nunca avanzar sin beneficiario definido
+    if (!donacion.beneficiarioId) {
+      return res.status(400).json({ error: 'No se puede avanzar el estado sin un beneficiario asignado' });
+    }
+
     donacion.estado = estado;
     await donacion.save();
 
@@ -117,4 +125,30 @@ async function cambiarEstado(req, res) {
   }
 }
 
-module.exports = { listarTodas, decidir, cambiarEstado };
+async function asignarBeneficiario(req, res) {
+  try {
+    const { beneficiarioId } = req.body;
+    if (!beneficiarioId) {
+      return res.status(400).json({ error: 'Debes indicar un beneficiario' });
+    }
+
+    const donacion = await Donation.findByPk(req.params.id);
+    if (!donacion) return res.status(404).json({ error: 'Donación no encontrada' });
+
+    if (donacion.estado === 'entregada' || donacion.estado === 'rechazada') {
+      return res.status(400).json({ error: 'Esta donación ya no se puede modificar' });
+    }
+
+    const beneficiario = await Beneficiary.findByPk(beneficiarioId);
+    if (!beneficiario) return res.status(400).json({ error: 'Beneficiario no encontrado' });
+
+    donacion.beneficiarioId = beneficiarioId;
+    await donacion.save();
+
+    res.json({ mensaje: 'Beneficiario asignado', donacion });
+  } catch (err) {
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+}
+
+module.exports = { listarTodas, decidir, cambiarEstado, asignarBeneficiario };
