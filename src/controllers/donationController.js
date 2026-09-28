@@ -8,8 +8,29 @@ async function crear(req, res) {
     if (!producto || !categoria || !cantidad || !peso) {
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
+    if (typeof producto !== 'string' || producto.length > 255) {
+      return res.status(400).json({ error: 'El nombre del producto no es válido (máximo 255 caracteres)' });
+    }
     if (!CATEGORIAS.includes(categoria)) {
       return res.status(400).json({ error: 'Categoría inválida' });
+    }
+
+    const cantidadNum = Number(cantidad);
+    const pesoNum = Number(peso);
+    if (!Number.isInteger(cantidadNum) || cantidadNum < 1 || cantidadNum > 1000000) {
+      return res.status(400).json({ error: 'La cantidad debe ser un número entero entre 1 y 1,000,000' });
+    }
+    if (!Number.isFinite(pesoNum) || pesoNum <= 0 || pesoNum > 100000) {
+      return res.status(400).json({ error: 'El peso debe ser mayor a 0 y máximo 100,000 kg' });
+    }
+    if (beneficiarioId && !Number.isInteger(Number(beneficiarioId))) {
+      return res.status(400).json({ error: 'El beneficiario indicado no es válido' });
+    }
+    if (
+      fechaCaducidad &&
+      (!/^\d{4}-\d{2}-\d{2}$/.test(fechaCaducidad) || Number.isNaN(Date.parse(fechaCaducidad)))
+    ) {
+      return res.status(400).json({ error: 'La fecha de caducidad no es válida (usa AAAA-MM-DD)' });
     }
     if (!req.file) {
       return res.status(400).json({ error: 'La imagen del producto es obligatoria' });
@@ -18,7 +39,7 @@ async function crear(req, res) {
     const esPerecedero = perecedero === 'true' || perecedero === true;
 
     if (beneficiarioId) {
-      const existe = await Beneficiary.findByPk(beneficiarioId);
+      const existe = await Beneficiary.findByPk(Number(beneficiarioId));
       if (!existe) {
         return res.status(400).json({ error: 'El beneficiario indicado no existe' });
       }
@@ -27,8 +48,8 @@ async function crear(req, res) {
     const donacion = await Donation.create({
       producto,
       categoria,
-      cantidad: Number(cantidad),
-      peso: Number(peso),
+      cantidad: cantidadNum,
+      peso: pesoNum,
       perecedero: esPerecedero,
       fechaCaducidad: esPerecedero ? fechaCaducidad : null,
       beneficiarioId: beneficiarioId ? Number(beneficiarioId) : null,
