@@ -1,0 +1,130 @@
+name: CI/CD
+
+on:
+  push:
+  pull_request:
+    branches: [main, master]
+
+env:
+  NODE_VERSION: 20
+  DB_HOST: 127.0.0.1
+  DB_PORT: 3306
+  DB_NAME: gestor_donaciones_ci
+  DB_USER: root
+  DB_PASSWORD: root_ci_password
+  DB_DIALECT: mysql
+  JWT_SECRET: secreto_solo_para_ci
+
+jobs:
+  test:
+    name: Pruebas unitarias y cobertura
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root_ci_password
+          MYSQL_DATABASE: gestor_donaciones_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot_ci_password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar pruebas (falla si la cobertura es menor al 80%)
+        run: npm test
+
+      - name: Guardar reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-cobertura
+          path: coverage/
+
+  deploy-test:
+    name: Despliegue en entorno de prueba
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root_ci_password
+          MYSQL_DATABASE: gestor_donaciones_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot_ci_password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir imagen Docker
+        run: docker build -t gestor-donaciones:ci .
+
+      - name: Desplegar en el entorno de prueba
+        run: |
+          docker run -d --name gestor-app --network host \
+            -e PORT=3000 \
+            -e DB_HOST=${{ env.DB_HOST }} \
+            -e DB_PORT=${{ env.DB_PORT }} \
+            -e DB_NAME=${{ env.DB_NAME }} \
+            -e DB_USER=${{ env.DB_USER }} \
+            -e DB_PASSWORD=${{ env.DB_PASSWORD }} \
+            -e DB_DIALECT=${{ env.DB_DIALECT }} \
+            -e JWT_SECRET=${{ env.JWT_SECRET }} \
+            gestor-donaciones:ci
+
+      - name: Esperar a que la aplicación responda
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/api/health; then exit 0; fi
+            sleep 2
+          done
+          docker logs gestor-app
+          exit 1
+
+      - name: Pruebas de humo (autenticación y roles)
+        run: |
+          set -e
+          BASE=http://localhost:3000/api
+          CORREO="smoke-$(date +%s)@test.com"
+
+          curl -sf -X POST $BASE/auth/register -H "Content-Type: application/json" \
+            -d "{\"nombre\":\"Smoke Test\",\"direccion\":\"Calle 1\",\"ciudad\":\"Ciudad\",\"telefono\":\"5551234567\",\"correo\":\"$CORREO\",\"password\":\"MiClave123\"}"
+
+          TOKEN=$(curl -sf -X POST $BASE/auth/login -H "Content-Type: application/json" \
+            -d "{\"correo\":\"$CORREO\",\"password\":\"MiClave123\"}" | jq -r .token)
+          [ -n "$TOKEN" ] && [ "$TOKEN" != "null" ]
+
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" $BASE/auth/me)
+          echo "Sin token: $CODE (esperado 401)"; [ "$CODE" = "401" ]
+
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" $BASE/auth/me)
+          echo "Con token: $CODE (esperado 200)"; [ "$CODE" = "200" ]
+
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" $BASE/admin/donations)
+          echo "Donador en ruta admin: $CODE (esperado 403)"; [ "$CODE" = "403" ]
+
+      - name: Registros de la aplicación (si algo falló)
+        if: failure()
+        run: docker logs gestor-app
