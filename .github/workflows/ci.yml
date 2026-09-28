@@ -6,7 +6,7 @@ on:
     branches: [main, master]
 
 env:
-  NODE_VERSION: 20
+  NODE_VERSION: 24
   DB_HOST: 127.0.0.1
   DB_PORT: 3306
   DB_NAME: gestor_donaciones_ci
