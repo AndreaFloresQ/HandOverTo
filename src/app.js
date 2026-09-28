@@ -28,4 +28,12 @@ app.get('/api/donador/ping', verificarToken, permitirRoles('donador'), (req, res
   res.json({ mensaje: 'Hola, donador' })
 );
 
+// Manejador de errores (subida de archivos y errores no controlados)
+app.use((err, req, res, next) => {
+  if (err.name === 'MulterError' || err.message?.startsWith('Solo se permiten')) {
+    return res.status(400).json({ error: err.message });
+  }
+  res.status(500).json({ error: 'Error del servidor' });
+});
+
 module.exports = app;

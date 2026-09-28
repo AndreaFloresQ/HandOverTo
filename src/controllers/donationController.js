@@ -31,7 +31,7 @@ async function crear(req, res) {
       peso: Number(peso),
       perecedero: esPerecedero,
       fechaCaducidad: esPerecedero ? fechaCaducidad : null,
-      beneficiarioId: beneficiarioId || null,
+      beneficiarioId: beneficiarioId ? Number(beneficiarioId) : null,
       imagen: `/uploads/${req.file.filename}`,
       donadorId: req.usuario.id,
     });
