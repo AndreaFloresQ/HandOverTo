@@ -1,0 +1,191 @@
+openapi: 3.0.3
+info:
+  title: Gestor de donaciones API
+  version: 1.0.0
+servers:
+  - url: http://host.docker.internal:3000/api
+paths:
+  /health:
+    get:
+      responses:
+        '200': { description: OK }
+  /auth/register:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre: { type: string, example: "Prueba ZAP" }
+                empresa: { type: string, example: "Empresa ZAP" }
+                direccion: { type: string, example: "Calle 1" }
+                ciudad: { type: string, example: "Ciudad" }
+                telefono: { type: string, example: "5551234567" }
+                correo: { type: string, example: "zap-registro@test.com" }
+                password: { type: string, example: "MiClave123" }
+      responses:
+        '201': { description: Creado }
+        '400': { description: Datos inválidos }
+        '409': { description: Correo ya registrado }
+  /auth/login:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo: { type: string, example: "zap-donador@test.com" }
+                password: { type: string, example: "MiClave123" }
+      responses:
+        '200': { description: Token JWT }
+        '401': { description: Credenciales inválidas }
+  /auth/me:
+    get:
+      responses:
+        '200': { description: Perfil }
+        '401': { description: Sin token }
+  /public/beneficiaries:
+    get:
+      responses:
+        '200': { description: Lista pública }
+  /donations:
+    post:
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                producto: { type: string, example: "Despensa ZAP" }
+                categoria: { type: string, enum: [alimentos, ropa, medicamentos, higiene, muebles, otros] }
+                cantidad: { type: integer, example: 3 }
+                peso: { type: number, example: 5 }
+                perecedero: { type: boolean, example: false }
+                fechaCaducidad: { type: string, format: date }
+                beneficiarioId: { type: integer, example: 1 }
+                imagen: { type: string, format: binary }
+      responses:
+        '201': { description: Creada }
+        '400': { description: Datos inválidos }
+  /donations/mias:
+    get:
+      responses:
+        '200': { description: Mis donaciones }
+  /donations/notificaciones:
+    get:
+      responses:
+        '200': { description: Mis notificaciones }
+  /donations/notificaciones/{id}/leida:
+    patch:
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, example: 1 } }
+      responses:
+        '200': { description: Marcada }
+        '404': { description: No encontrada }
+  /admin/donations:
+    get:
+      parameters:
+        - { name: estado, in: query, required: false, schema: { type: string, example: pendiente } }
+      responses:
+        '200': { description: Todas las donaciones }
+  /admin/donations/{id}/decidir:
+    patch:
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, example: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accion: { type: string, enum: [aprobar, rechazar] }
+                recolectorId: { type: integer, example: 1 }
+                beneficiarioId: { type: integer, example: 1 }
+                motivoRechazo: { type: string, example: "Prueba ZAP" }
+      responses:
+        '200': { description: Procesada }
+        '400': { description: Datos inválidos }
+  /admin/donations/{id}/estado:
+    patch:
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, example: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado: { type: string, enum: [en_transito, entregada] }
+      responses:
+        '200': { description: Actualizada }
+        '400': { description: Datos inválidos }
+  /admin/donations/{id}/beneficiario:
+    patch:
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, example: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                beneficiarioId: { type: integer, example: 1 }
+      responses:
+        '200': { description: Asignado }
+        '400': { description: Datos inválidos }
+  /admin/beneficiaries:
+    get:
+      responses:
+        '200': { description: Lista }
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre: { type: string, example: "Beneficiario ZAP" }
+                razonSocial: { type: string, example: "ZAP A.C." }
+                rfc: { type: string, example: "ZAP010101AAA" }
+                direccion: { type: string, example: "Calle ZAP 1" }
+                telefono: { type: string, example: "5550001111" }
+                encargado: { type: string, example: "Encargado ZAP" }
+                categorias: { type: array, items: { type: string, enum: [alimentos, ropa, medicamentos, higiene, muebles, otros] } }
+      responses:
+        '201': { description: Creado }
+        '400': { description: Datos inválidos }
+  /admin/beneficiaries/{id}:
+    put:
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, example: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre: { type: string, example: "Beneficiario ZAP editado" }
+                categorias: { type: array, items: { type: string, enum: [alimentos, ropa, medicamentos, higiene, muebles, otros] } }
+      responses:
+        '200': { description: Actualizado }
+        '404': { description: No encontrado }
+    delete:
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, example: 1 } }
+      responses:
+        '200': { description: Eliminado }
+        '404': { description: No encontrado }
+  /admin/collectors:
+    get:
+      responses:
+        '200': { description: Lista de recolectores }
