@@ -64,7 +64,7 @@ async function login(req, res) {
       process.env.JWT_SECRET,
       { expiresIn: '2h' }
     );
-
+  
     res.json({ token, usuario: sinPassword(usuario) });
   } catch (err) {
     res.status(500).json({ error: 'Error del servidor' });
